@@ -7,7 +7,7 @@
 }
 \ProcessOptions\relax
 
-\LoadClass[a4paper,14pt, oneside]{book}
+\LoadClassWithOptions{extbook} %[a4paper,30pt, oneside]
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%% Useful packages %%%%%
@@ -243,7 +243,7 @@
 }
 
 \newcommand{\titlecontents}{
-    \titlepage \addemptypage
+    %\titlepage \addemptypage
     \tableofcontents \addemptypage
     \pagestyle{miptthesis}
 }
