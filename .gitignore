@@ -5,4 +5,4 @@
 *.gz
 *.toc
 thesis/mipt-thesis/
-
+.idea/
