@@ -5,7 +5,7 @@ from torchrl.data import CompositeSpec, DiscreteTensorSpec, UnboundedDiscreteTen
 
 
 class GCQNEnv(EnvBase):
-    def __init__(self, interactions_df, users_pos_items, NUM_ITEMS, NUM_USERS, ITEM_ID_PAD,
+    def __init__(self, num_users, num_items, item_id_pad, interactions_df, users_pos_items,
                  batch_size=32, episode_num_steps=20, seed=1488, device="cpu", env_for_valid=False):
         super().__init__(device=device, batch_size=[batch_size])
         self.interactions_df = interactions_df
@@ -18,9 +18,9 @@ class GCQNEnv(EnvBase):
         self.set_seed(seed)
         self.env_for_valid = env_for_valid
         self.batch_num = 0
-        self.NUM_ITEMS = NUM_ITEMS
-        self.NUM_USERS = NUM_USERS
-        self.ITEM_ID_PAD = ITEM_ID_PAD
+        self.num_items = num_items
+        self.num_users = num_users
+        self.item_id_pad = item_id_pad
 
     def _set_seed(self, seed):
         rng = torch.manual_seed(seed)
@@ -37,7 +37,7 @@ class GCQNEnv(EnvBase):
             batch_users_inds = torch.randperm(len(self.users_ids), generator=self.rng)[:self.batch_size[0]]
             batch_users_ids = self.users_ids[
                 batch_users_inds]  # np.random.choice(self.users_ids, size=self.batch_size[0], replace=False)
-        batch_users_items = torch.full((self.batch_size[0], self.episode_num_steps), self.ITEM_ID_PAD, dtype=torch.int64)
+        batch_users_items = torch.full((self.batch_size[0], self.episode_num_steps), self.item_id_pad, dtype=torch.int64)
         batch_users_timestamps = torch.zeros(self.batch_size[0], self.episode_num_steps, dtype=torch.int64)
         batch_users_rewards = torch.zeros(self.batch_size[0], self.episode_num_steps, dtype=torch.int64)
         for user_num, user_id in enumerate(batch_users_ids):
@@ -128,13 +128,13 @@ class GCQNEnv(EnvBase):
     def _make_spec(self):
         self.observation_spec = CompositeSpec(
             users_ids=DiscreteTensorSpec(
-                n=self.NUM_USERS,
+                n=self.num_users,
                 shape=self.batch_size,
                 dtype=torch.int64,
                 device=self.device,
             ),
             users_items=DiscreteTensorSpec(
-                n=self.NUM_ITEMS + 1,
+                n=self.num_items + 1,
                 shape=(self.batch_size[0], self.episode_num_steps),
                 dtype=torch.int64,
                 device=self.device,
@@ -160,7 +160,7 @@ class GCQNEnv(EnvBase):
         )
         self.input_spec = self.observation_spec.clone()
         self.action_spec = DiscreteTensorSpec(
-            n=self.NUM_ITEMS,
+            n=self.num_items,
             shape=self.batch_size,
             dtype=torch.int64,
             device=self.device,

@@ -4,7 +4,7 @@ from graph_models_common import EmbeddingModule, MLPPredictor, DotPredictor
 
 
 class GCQN(nn.Module):
-    def __init__(self, num_items, num_users, interactions_graph, raw_embedding_dim, gnn_embedding_dim, rnn_embedding_dim,
+    def __init__(self, num_users, num_items, interactions_graph, raw_embedding_dim, gnn_embedding_dim, rnn_embedding_dim,
                  reward_dim=16, num_heads=4, num_layers=1, num_neighbours=10, gnn_type="gat", rnn_type="gru",
                  predictor_type="dot", use_rewards_in_rnn=True, predictor_hidden_dim=100, device="cpu"):
         super().__init__()

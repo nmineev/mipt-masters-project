@@ -6,3 +6,5 @@
 *.toc
 thesis/mipt-thesis/
 .idea/
+code/outputs/
+__pycache__/

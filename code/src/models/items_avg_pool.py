@@ -2,7 +2,7 @@ import torch.nn as nn
 
 
 class ItemsAvgPool(nn.Module):
-    def __init__(self, embedding_dim, num_users, num_items, item_id_pad):
+    def __init__(self, num_items, item_id_pad, embedding_dim):
         super().__init__()
         self.item_id_pad = item_id_pad
         self.items_embeddings = nn.Embedding(num_items + 1, embedding_dim, padding_idx=self.item_id_pad)
