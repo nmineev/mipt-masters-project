@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 
-class ItemsRNN(nn.Module):
+class RNNQ(nn.Module):
     def __init__(self, num_items, embedding_dim=16, rnn_type="gru", reward_dim=16,
                  use_rewards=False):
         super().__init__()

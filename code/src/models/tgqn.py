@@ -3,7 +3,7 @@ import torch.nn as nn
 from graph_models_common import MemoryModule, EmbeddingModule, MLPPredictor, DotPredictor
 
 
-class TGN(nn.Module):
+class TGQN(nn.Module):
     def __init__(self, num_users, num_items, interactions_graph, memory_dim, embedding_dim, reward_dim, num_heads=4,
                  num_layers=1, num_neighbours=10, gnn_type="edge_gat", rnn_type="gru", memory_alpha=0.5,
                  use_users_raw_embeddings=False, items_memory_batch_agg="mean", items_embedding_module_input="sum",

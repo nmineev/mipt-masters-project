@@ -6,8 +6,9 @@ visin = torch.vmap(torch.isin)
 
 
 class GCQNQValueModule(QValueModule):
-    def __init__(self, num_users, num_items, item_id_pad, interactions_df, users_items_to_take_actions, num_top_to_take_action=100, exploration_eps=0,
-                 num_to_take_in_exploration=50, *args, **kwargs):
+    def __init__(self, num_users, num_items, item_id_pad, interactions_df, users_items_to_take_actions,
+                 num_top_to_take_action=100, exploration_eps=0, num_to_take_in_exploration=50,
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.interactions_df = interactions_df
         self.users_items_to_take_actions = users_items_to_take_actions

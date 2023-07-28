@@ -1,10 +1,11 @@
 common:
+  wandb_project: "RL RecSys Experiment"
   dataset_name: "steam" # "goodreads" "movielens1m"
   model_type: "tgqn" # "gcqn" "svdq" "rnnq" "random"
   model_info: ""
   optimizer: "Adam"
   scheduler: "ReduceLROnPlateau"
-  device: "cpu"
+  device: "cpu" # "cuda"
   seed: 1488
   batch_size: 32
   test_size: 1000
