@@ -1,7 +1,7 @@
 import torch
 
 
-def train(policy, env, optimizer, criterion, wandb=None, episode=None):
+def train_loop(policy, env, optimizer, criterion, wandb=None, episode=None):
     policy.train()
     device = next(policy.parameters()).device
     input_tensordict = env.reset()
@@ -43,7 +43,7 @@ def train(policy, env, optimizer, criterion, wandb=None, episode=None):
 
 
 @torch.no_grad()
-def valid(policy, env, criterion, n_valid_episodes=1):
+def valid_loop(policy, env, criterion, n_valid_episodes=1):
     policy.eval()
     device = next(policy.parameters()).device
     valid_loss_val, valid_metric_val = 0, 0

@@ -2,8 +2,8 @@ import copy
 import torch
 import torch.nn as nn
 from tensordict.nn import TensorDictModule
-from environment import GCQNEnv
-from models import GCQNQValueModule, SVD
+from .environment import GCQNEnv
+from .models import GCQNQValueModule, SVDQ
 
 
 class PerfectRecommender(nn.Module):
@@ -50,10 +50,12 @@ def test_correctness(recommended_items, users_items):
 
 
 @torch.no_grad()
-def test_QValueModule(df, users_pos_items, users_items_to_take_actions):
-    env = GCQNEnv(df, users_pos_items, batch_size=100)
-    svd = TensorDictModule(SVD(10), in_keys=["users_ids"], out_keys=["action_value"])
-    qval = GCQNQValueModule(df, users_items_to_take_actions, action_space=env.action_spec)
+def test_QValueModule(num_users, num_items, item_id_pad, df, users_pos_items, users_items_to_take_actions):
+    env = GCQNEnv(num_users, num_items, item_id_pad, df, users_pos_items, batch_size=100)
+    svd = TensorDictModule(SVDQ(num_users, num_items, 10),
+                           in_keys=["users_ids", "users_items", "users_rewards", "step_num"],
+                           out_keys=["action_value"])
+    qval = GCQNQValueModule(num_users, num_items, item_id_pad, df, users_items_to_take_actions, action_space=env.action_spec)
     td = env.reset()
     users_ids = td["users_ids"]
     first_items = td["users_items"][:, 0]

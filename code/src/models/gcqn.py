@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from graph_models_common import EmbeddingModule, MLPPredictor, DotPredictor
+from .graph_models_common import EmbeddingModule, MLPPredictor, DotPredictor
 
 
 class GCQN(nn.Module):
@@ -14,7 +14,7 @@ class GCQN(nn.Module):
 
         in_node_feats, in_edge_feats, out_node_feats, out_edge_feats = raw_embedding_dim, reward_dim, gnn_embedding_dim, reward_dim
         self.embedding_module = EmbeddingModule(
-            interactions_graph, in_node_feats, in_edge_feats, num_heads,
+            num_items, interactions_graph, in_node_feats, in_edge_feats, num_heads,
             out_node_feats, out_edge_feats, num_layers, num_neighbours, gnn_type, device=device)
 
         self.use_rewards_in_rnn = use_rewards_in_rnn

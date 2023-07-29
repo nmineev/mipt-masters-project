@@ -8,6 +8,9 @@ class GCQNEnv(EnvBase):
     def __init__(self, num_users, num_items, item_id_pad, interactions_df, users_pos_items,
                  batch_size=32, episode_num_steps=20, seed=1488, device="cpu", env_for_valid=False):
         super().__init__(device=device, batch_size=[batch_size])
+        self.num_items = num_items
+        self.num_users = num_users
+        self.item_id_pad = item_id_pad
         self.interactions_df = interactions_df
         self.users_ids = interactions_df.user_id.unique()
         self.episode_num_steps = episode_num_steps
@@ -18,9 +21,6 @@ class GCQNEnv(EnvBase):
         self.set_seed(seed)
         self.env_for_valid = env_for_valid
         self.batch_num = 0
-        self.num_items = num_items
-        self.num_users = num_users
-        self.item_id_pad = item_id_pad
 
     def _set_seed(self, seed):
         rng = torch.manual_seed(seed)

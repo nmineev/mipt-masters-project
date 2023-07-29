@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from graph_models_common import MemoryModule, EmbeddingModule, MLPPredictor, DotPredictor
+from .graph_models_common import MemoryModule, EmbeddingModule, MLPPredictor, DotPredictor
 
 
 class TGQN(nn.Module):
@@ -38,7 +38,7 @@ class TGQN(nn.Module):
         if use_users_raw_embeddings:
             self.users_raw_embeddings = nn.Embedding(num_users, memory_dim)
 
-        self.memory_module = MemoryModule(memory_dim, memory_alpha)
+        self.memory_module = MemoryModule(num_users, num_items, memory_dim, memory_alpha)
 
         rnn_input_dim = 2 * memory_dim + self.reward_dim if use_users_raw_embeddings else memory_dim + self.reward_dim
         self.rnn = nn.LSTM(rnn_input_dim, memory_dim, batch_first=True) \
@@ -47,7 +47,7 @@ class TGQN(nn.Module):
         in_node_feats = memory_dim * 2 if items_embedding_module_input == "cat" else memory_dim
         in_edge_feats, out_node_feats, out_edge_feats = reward_dim, embedding_dim, reward_dim
         self.embedding_module = EmbeddingModule(
-            interactions_graph, in_node_feats, in_edge_feats, num_heads,
+            num_items, interactions_graph, in_node_feats, in_edge_feats, num_heads,
             out_node_feats, out_edge_feats, num_layers, num_neighbours, gnn_type, pos_interactions_only, device=device)
 
         predictor_input_dims = {"sum": memory_dim, "cat": memory_dim * 2 + embedding_dim, "memory": memory_dim,

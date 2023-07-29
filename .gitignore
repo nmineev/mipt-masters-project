@@ -4,7 +4,9 @@
 *.pdf
 *.gz
 *.toc
+*.csv
 thesis/mipt-thesis/
 .idea/
 code/outputs/
 __pycache__/
+wandb/
