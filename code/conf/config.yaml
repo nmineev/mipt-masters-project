@@ -1,6 +1,6 @@
 common:
   wandb_project: "RL RecSys Experiment"
-  dataset_name: "steam" # "steam" "goodreads" "movielens1m"
+  dataset_name: "movielens1m" # "steam" "goodreads" "movielens1m"
   model_type: "rnnq" # "tgqn" "gcqn" "svdq" "rnnq" "random"
   model_info: ""
   optimizer: "Adam"
@@ -19,21 +19,21 @@ common:
   optimizer_lr: 1e-4
 
 tgqn:
-  memory_dim: 16
-  embedding_dim: 16
-  reward_dim: 4
-  num_heads: 1
-  num_layers: 1
+  memory_dim: 100
+  embedding_dim: 100
+  reward_dim: 32
+  num_heads: 4
+  num_layers: 2
   num_neighbours: 10
   gnn_type: "edge_gat"
-  rnn_type: "gru"
+  rnn_type: "lstm"
   memory_alpha: 0.7
   use_users_raw_embeddings: True
   items_memory_batch_agg: "mean"
   items_embedding_module_input: "cat"
   users_embedding_module_input: "cat"
-  predictor_type: "dot"
-  predictor_hidden_dim: 32
+  predictor_type: "mlp"
+  predictor_hidden_dim: 100
   users_predictor_input: "cat"
   items_predictor_input: "cat"
   use_items_memory_as_hidden: False

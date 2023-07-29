@@ -5,6 +5,7 @@
 *.gz
 *.toc
 *.csv
+*.dat
 thesis/mipt-thesis/
 .idea/
 code/outputs/

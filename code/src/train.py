@@ -29,37 +29,49 @@ def get_dataset(dataset_name):
         df["rating"] = df.is_recommended.astype(int) * 5
         df.sort_values("timestamp", inplace=True, ignore_index=True)
         df.rename(columns={"app_id": "item_id"}, inplace=True)
-        gc.collect()
+    elif dataset_name == "goodreads":
+        df = pd.read_csv("./data/goodreads.csv")
+        df.drop(columns=["has_spoiler", "review_id", "old_timestamp", "user_id_original", "item_id_original", "reward"],
+                inplace=True)
+        n_items = 1500
+        df = df[df.item_id.isin(df.item_id.value_counts()[:n_items].index)].copy()
+        df.sort_values("timestamp", inplace=True, ignore_index=True)
+    else:
+        df = pd.read_csv(
+            "./data/movielens1m.dat",
+            sep="::",
+            names=['user_id', 'item_id', 'rating', 'timestamp']
+        )
+        df.sort_values("timestamp", inplace=True, ignore_index=True)
+    gc.collect()
+    # Drop users with less than min_num_positive_ratings positive ratings
+    min_num_positive_ratings = 28
+    max_num_positive_ratings = 1000
+    max_num_negative_ratings = 1000
+    user_num_positive_ratings = df[df.rating > 3].user_id.value_counts()
+    users_ids_with_min_num_positive_ratings = user_num_positive_ratings.index[
+        user_num_positive_ratings >= min_num_positive_ratings]
+    users_ids_with_max_num_positive_ratings = user_num_positive_ratings.index[
+        user_num_positive_ratings > max_num_positive_ratings]
+    user_num_negative_ratings = df[df.rating <= 3].user_id.value_counts()
+    users_ids_with_max_num_negative_ratings = user_num_negative_ratings.index[
+        user_num_negative_ratings > max_num_negative_ratings]
+    df = df[df.user_id.isin(users_ids_with_min_num_positive_ratings)
+            & ~df.user_id.isin(users_ids_with_max_num_positive_ratings)
+            & ~df.user_id.isin(users_ids_with_max_num_negative_ratings)].copy()
 
-        # Drop users with less than min_num_positive_ratings positive ratings
-        min_num_positive_ratings = 28
-        max_num_positive_ratings = 1000
-        max_num_negative_ratings = 1000
-        user_num_positive_ratings = df[df.rating > 3].user_id.value_counts()
-        users_ids_with_min_num_positive_ratings = user_num_positive_ratings.index[
-            user_num_positive_ratings >= min_num_positive_ratings]
-        users_ids_with_max_num_positive_ratings = user_num_positive_ratings.index[
-            user_num_positive_ratings > max_num_positive_ratings]
-        user_num_negative_ratings = df[df.rating <= 3].user_id.value_counts()
-        users_ids_with_max_num_negative_ratings = user_num_negative_ratings.index[
-            user_num_negative_ratings > max_num_negative_ratings]
-        df = df[df.user_id.isin(users_ids_with_min_num_positive_ratings)
-                & ~df.user_id.isin(users_ids_with_max_num_positive_ratings)
-                & ~df.user_id.isin(users_ids_with_max_num_negative_ratings)].copy()
+    user_id_encoder = LabelEncoder().fit(df.user_id)
+    item_id_encoder = LabelEncoder().fit(df.item_id)
+    df["user_id_original"] = df.user_id.copy()
+    df["item_id_original"] = df.item_id.copy()
+    df["user_id"] = user_id_encoder.transform(df.user_id)
+    df["item_id"] = item_id_encoder.transform(df.item_id)
+    NUM_USERS = df.user_id.unique().shape[0]
+    NUM_ITEMS = df.item_id.unique().shape[0]
+    ITEM_ID_PAD = NUM_ITEMS
+    df["reward"] = (df.rating > 3).astype(int)
 
-        user_id_encoder = LabelEncoder().fit(df.user_id)
-        item_id_encoder = LabelEncoder().fit(df.item_id)
-        df["user_id_original"] = df.user_id.copy()
-        df["item_id_original"] = df.item_id.copy()
-        df["user_id"] = user_id_encoder.transform(df.user_id)
-        df["item_id"] = item_id_encoder.transform(df.item_id)
-        NUM_USERS = df.user_id.unique().shape[0]
-        NUM_ITEMS = df.item_id.unique().shape[0]
-        ITEM_ID_PAD = NUM_ITEMS
-        df["reward"] = (df.rating > 3).astype(int)
-
-        return df, NUM_USERS, NUM_ITEMS, ITEM_ID_PAD
-    return None
+    return df, NUM_USERS, NUM_ITEMS, ITEM_ID_PAD
 
 
 def get_users_pos_items(df, NUM_USERS, ITEM_ID_PAD):
@@ -69,7 +81,7 @@ def get_users_pos_items(df, NUM_USERS, ITEM_ID_PAD):
     for user_id in tqdm.tqdm(range(NUM_USERS), desc="Create users_pos_items"):
         user_pos_items = df[(df.user_id == user_id) & (df.reward == 1)].item_id.values
         users_pos_items[user_id, :len(user_pos_items)] = torch.from_numpy(user_pos_items)
-        if user_id == 1500: break ##################
+        #if user_id == 1500: break ##################
     return users_pos_items
 
 
@@ -82,7 +94,7 @@ def get_users_items_to_take_actions(df, NUM_USERS, ITEM_ID_PAD):
                                         .item_id.values[:num_items_to_take_action]
         users_items_to_take_actions[user_id, :len(user_items_to_take_action)] = torch.from_numpy(
             user_items_to_take_action)
-        if user_id == 1500: break #########################################3
+        #if user_id == 1500: break #########################################3
     return users_items_to_take_actions
 
 
@@ -224,9 +236,9 @@ def train(cfg, wandb, logger):
     check_env_specs(env)
     env = GCQNEnv(num_users, num_items, item_id_pad, df, users_pos_items, device="cpu", env_for_valid=True)
     check_env_specs(env)
-    # logger.info(
-    #     "Test QValueModule: " +
-    #     test_QValueModule(num_users, num_items, item_id_pad, df, users_pos_items, users_items_to_take_actions))
+    logger.info(
+        "Test QValueModule: " +
+        test_QValueModule(num_users, num_items, item_id_pad, df, users_pos_items, users_items_to_take_actions))
 
     # Set environments
     logger.info(

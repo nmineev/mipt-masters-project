@@ -105,7 +105,7 @@ def test_QValueModule(num_users, num_items, item_id_pad, df, users_pos_items, us
     assert (td_pos["action"] == neg_items_ids)[neg_items_ids != 0].all()
     assert not td_pos["next", "reward"].all()
 
-    qval_exploration = GCQNQValueModule(df, users_items_to_take_actions, action_space=env.action_spec,
+    qval_exploration = GCQNQValueModule(num_users, num_items, item_id_pad, df, users_items_to_take_actions, action_space=env.action_spec,
                                         exploration_eps=5.,
                                         num_to_take_in_exploration=20)
     td = env.reset()
