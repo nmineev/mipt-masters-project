@@ -2,6 +2,8 @@
 *.aux
 *.log
 *.pdf
+!msproject_slides.pdf
+!masters_thesis_final.pdf
 *.gz
 *.toc
 *.csv
